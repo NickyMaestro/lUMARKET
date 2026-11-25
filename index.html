@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laikipia University Marketplace</title>
+<style>
+  body{font-family:Arial;margin:0;background:#fff;color:#111}
+  header{background:#D32F2F;color:#fff;padding:16px;text-align:center}
+  .cat{display:flex;gap:8px;overflow-x:auto;padding:10px}
+  .cat button{background:#fff;border:1px solid #D32F2F;color:#D32F2F;padding:8px 12px;border-radius:20px;white-space:nowrap}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
+  .card{border:1px solid #eee;border-radius:12px;overflow:hidden}
+  .card img{width:100%;height:140px;object-fit:cover}
+  .card div{padding:8px}
+  .price{color:#D32F2F;font-weight:bold}
+  .btn{background:#D32F2F;color:#fff;border:none;padding:10px;width:100%;border-radius:8px;margin-top:6px}
+  .wa{background:#25D366;color:#fff;border:none;padding:10px;width:100%;border-radius:8px;margin-top:6px}
+  input,select,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
+  .box{padding:14px}
+  .fee{background:#FFEBEE;padding:10px;border-radius:8px;font-size:14px}
+</style>
+</head>
+<body>
+<header><h2 style="margin:0">Laikipia University Marketplace</h2><p style="margin:4px 0;font-size:13px">Sell Free • Buyer Pays to Till 6889219</p></header>
+<div class="cat" id="cats"></div>
+<div style="padding:0 10px"><input id="search" placeholder="Search woofer, gas, shoes..."></div>
+<div class="grid" id="products"></div>
+<div class="box" style="border-top:4px solid #D32F2F">
+<h3>Sell Your Item - FREE</h3>
+<input id="p_title" placeholder="Item name e.g. Woofer">
+<select id="p_cat"><option>Phones & Accessories</option><option>Clothes & Shoes</option><option>Furniture</option><option>Woofers & Speakers</option><option>Gas Cylinders</option><option>Electric Appliances</option></select>
+<input id="p_price" type="number" placeholder="Price KSh e.g. 3500">
+<input id="p_name" placeholder="Your Name">
+<input id="p_whatsapp" placeholder="WhatsApp 2547...">
+<input id="p_location" placeholder="Location e.g. Main Campus Hostel B">
+<input id="p_img" placeholder="Image URL (paste from imgbb)">
+<textarea id="p_desc" placeholder="Description"></textarea>
+<div class="fee" id="feeBox">Enter price to see your payout</div>
+<button class="btn" onclick="postItem()">Post Item For Free</button>
+</div>
+<div class="box" id="checkoutBox" style="display:none;border-top:4px solid #25D366">
+<h3>Checkout</h3><p id="checkoutInfo"></p>
+<p><b>Step 1:</b> Go to M-Pesa > Lipa na M-Pesa > Buy Goods > Till <b>6889219</b></p>
+<p><b>Step 2:</b> Send exact amount. You will get SMS code e.g. QK7X...</p>
+<input id="buyer_name" placeholder="Your Name">
+<input id="buyer_phone" placeholder="Your Phone 2547...">
+<input id="mpesa_code" placeholder="Paste M-Pesa Code e.g. QK7X...">
+<button class="btn" onclick="submitOrder()">I Have Paid - Submit Code</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://jbjylmqyacmmtsnyevhp.supabase.co";
+const SUPABASE_KEY = "sb_publishable_Gs3-G6kFwWbyKsyME5XOWg_LPK2g5xo";
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const cats = ["All","Phones & Accessories","Clothes & Shoes","Furniture","Woofers & Speakers","Gas Cylinders","Electric Appliances"];
+let currentCat = "All"; let selectedProduct = null;
+document.getElementById('cats').innerHTML = cats.map(c=>`<button onclick="filterCat('${c}')">${c}</button>`).join('');
+document.getElementById('p_price').addEventListener('input', e=>{
+  const p = Number(e.target.value||0);
+  document.getElementById('feeBox').innerHTML = `You sell for KSh ${p} - You receive KSh ${Math.round(p*0.9)} - Fee KSh ${Math.round(p*0.1)} (10%)`;
+});
+async function loadProducts(){
+  let q = client.from('products').select('*').order('created_at',{ascending:false});
+  if(currentCat!=="All") q = q.eq('category', currentCat);
+  const search = document.getElementById('search').value;
+  if(search) q = q.ilike('title', `%${search}%`);
+  const {data} = await q;
+  document.getElementById('products').innerHTML = (data||[]).map(p=>`
+    <div class="card">
+      <img src="${p.image_url||'https://via.placeholder.com/300'}">
+      <div><b>${p.title}</b><br><span style="font-size:12px">${p.location}</span><br>
+      <span class="price">KSh ${p.price}</span><br>
+      <button class="wa" onclick="window.open('https://wa.me/${p.whatsapp}?text=Hi, is ${encodeURIComponent(p.title)} still available?')">WhatsApp Seller</button>
+      <button class="btn" onclick="startCheckout(${p.id},'${p.title.replace(/'/g,"")} ',${p.price})">Buy Now</button>
+      </div></div>`).join('');
+}
+function filterCat(c){ currentCat=c; loadProducts(); }
+document.getElementById('search').addEventListener('input', loadProducts);
+async function postItem(){
+  const title=document.getElementById('p_title').value, price=Number(document.getElementById('p_price').value);
+  if(!title||!price) return alert("Add title + price");
+  const {error} = await client.from('products').insert([{ title, category: document.getElementById('p_cat').value, price, seller_name: document.getElementById('p_name').value, whatsapp: document.getElementById('p_whatsapp').value, location: document.getElementById('p_location').value, image_url: document.getElementById('p_img').value, description: document.getElementById('p_desc').value }]);
+  if(error) return alert(error.message);
+  alert("Posted!"); loadProducts();
+}
+function startCheckout(id,title,price){
+  selectedProduct={id,title,price};
+  document.getElementById('checkoutBox').style.display='block';
+  document.getElementById('checkoutInfo').innerHTML=`Buying: <b>${title}</b> - KSh ${price}`;
+  window.scrollTo(0, document.getElementById('checkoutBox').offsetTop);
+}
+async function submitOrder(){
+  const amount = selectedProduct.price;
+  const {error} = await client.from('orders').insert([{ product_id: selectedProduct.id, buyer_name: document.getElementById('buyer_name').value, buyer_phone: document.getElementById('buyer_phone').value, amount, commission: Math.round(amount*0.1), seller_payout: Math.round(amount*0.9), mpesa_code: document.getElementById('mpesa_code').value, status: 'awaiting_verification' }]);
+  if(error) return alert(error.message);
+  alert("Order submitted! Admin will verify your M-Pesa code.");
+}
+loadProducts();
+</script>
+</body>
+</html>
