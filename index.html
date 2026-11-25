@@ -1,101 +1,138 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Laikipia University Marketplace</title>
+<title>LUMARKET - Buy & Sell in Kenya</title>
 <style>
-  body{font-family:Arial;margin:0;background:#fff;color:#111}
-  header{background:#D32F2F;color:#fff;padding:16px;text-align:center}
-  .cat{display:flex;gap:8px;overflow-x:auto;padding:10px}
-  .cat button{background:#fff;border:1px solid #D32F2F;color:#D32F2F;padding:8px 12px;border-radius:20px;white-space:nowrap}
-  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}
-  .card{border:1px solid #eee;border-radius:12px;overflow:hidden}
-  .card img{width:100%;height:140px;object-fit:cover}
-  .card div{padding:8px}
-  .price{color:#D32F2F;font-weight:bold}
-  .btn{background:#D32F2F;color:#fff;border:none;padding:10px;width:100%;border-radius:8px;margin-top:6px}
-  .wa{background:#25D366;color:#fff;border:none;padding:10px;width:100%;border-radius:8px;margin-top:6px}
-  input,select,textarea{width:100%;padding:10px;margin:6px 0;border:1px solid #ddd;border-radius:8px;box-sizing:border-box}
-  .box{padding:14px}
-  .fee{background:#FFEBEE;padding:10px;border-radius:8px;font-size:14px}
+body{font-family:Arial;margin:0;background:#f5f5f5;padding-bottom:70px}
+header{background:#00a651;color:white;padding:15px;text-align:center;position:sticky;top:0;z-index:10}
+.card{background:white;margin:10px;padding:12px;border-radius:12px;box-shadow:0 2px 5px #ccc}
+.card img{width:100%;border-radius:10px;max-height:300px;object-fit:cover}
+input,button,select{width:100%;padding:12px;margin:6px 0;border-radius:8px;border:1px solid #ddd;font-size:16px;box-sizing:border-box}
+button{background:#00a651;color:white;border:none;font-weight:bold;cursor:pointer}
+button.red{background:#e74c3c} button.orange{background:#f39c12} button.grey{background:#888}
+.nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:white;border-top:1px solid #ddd}
+.nav button{background:white;color:#333;border-radius:0;margin:0}
+.nav button.active{background:#00a651;color:white}
+.stat{display:flex;gap:10px}
+.stat div{flex:1;background:#e8f8f0;padding:12px;border-radius:10px;text-align:center}
+.stat b{font-size:22px;color:#00a651;display:block}
+#status{color:green;text-align:center}
+.hidden{display:none}
+.badge{background:#00a651;color:white;padding:2px 8px;border-radius:10px;font-size:12px}
 </style>
 </head>
 <body>
-<header><h2 style="margin:0">Laikipia University Marketplace</h2><p style="margin:4px 0;font-size:13px">Sell Free • Buyer Pays to Till 6889219</p></header>
-<div class="cat" id="cats"></div>
-<div style="padding:0 10px"><input id="search" placeholder="Search woofer, gas, shoes..."></div>
-<div class="grid" id="products"></div>
-<div class="box" style="border-top:4px solid #D32F2F">
-<h3>Sell Your Item - FREE</h3>
-<input id="p_title" placeholder="Item name e.g. Woofer">
-<select id="p_cat"><option>Phones & Accessories</option><option>Clothes & Shoes</option><option>Furniture</option><option>Woofers & Speakers</option><option>Gas Cylinders</option><option>Electric Appliances</option></select>
-<input id="p_price" type="number" placeholder="Price KSh e.g. 3500">
-<input id="p_name" placeholder="Your Name">
-<input id="p_whatsapp" placeholder="WhatsApp 2547...">
-<input id="p_location" placeholder="Location e.g. Main Campus Hostel B">
-<input id="p_img" placeholder="Image URL (paste from imgbb)">
-<textarea id="p_desc" placeholder="Description"></textarea>
-<div class="fee" id="feeBox">Enter price to see your payout</div>
-<button class="btn" onclick="postItem()">Post Item For Free</button>
+<header><h1 style="margin:0">LUMARKET 🇰🇪</h1><p style="margin:5px 0 0">Buy & Sell - Nyahururu & Kenya</p></header>
+
+<!-- HOME -->
+<div id="page-home">
+<div class="card"><input id="search" placeholder="🔍 Search e.g. Shoes, Phone..."><button onclick="doSearch()">Search</button></div>
+<h2 style="padding:0 10px">Fresh Products <span id="count"></span></h2>
+<div id="products"></div>
 </div>
-<div class="box" id="checkoutBox" style="display:none;border-top:4px solid #25D366">
-<h3>Checkout</h3><p id="checkoutInfo"></p>
-<p><b>Step 1:</b> Go to M-Pesa > Lipa na M-Pesa > Buy Goods > Till <b>6889219</b></p>
-<p><b>Step 2:</b> Send exact amount. You will get SMS code e.g. QK7X...</p>
-<input id="buyer_name" placeholder="Your Name">
-<input id="buyer_phone" placeholder="Your Phone 2547...">
-<input id="mpesa_code" placeholder="Paste M-Pesa Code e.g. QK7X...">
-<button class="btn" onclick="submitOrder()">I Have Paid - Submit Code</button>
+
+<!-- SELL -->
+<div id="page-sell" class="hidden">
+<div class="card">
+<h2>Sell Your Product 📸</h2>
+<input id="pname" placeholder="Product Name e.g. Nike Shoes">
+<input id="pprice" placeholder="Price e.g. 1500" type="number">
+<input id="pphone" placeholder="Your WhatsApp e.g. 0712345678">
+<select id="pcat"><option>Clothes</option><option>Shoes</option><option>Phones</option><option>Electronics</option><option>Home</option><option>Other</option></select>
+<label>Take Photo:</label>
+<input type="file" id="pphoto" accept="image/*" capture="camera">
+<button id="uploadBtn">UPLOAD TO LUMARKET</button>
+<p id="status"></p>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-const SUPABASE_URL = "https://jbjylmqyacmmtsnyevhp.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Gs3-G6kFwWbyKsyME5XOWg_LPK2g5xo";
-const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-const cats = ["All","Phones & Accessories","Clothes & Shoes","Furniture","Woofers & Speakers","Gas Cylinders","Electric Appliances"];
-let currentCat = "All"; let selectedProduct = null;
-document.getElementById('cats').innerHTML = cats.map(c=>`<button onclick="filterCat('${c}')">${c}</button>`).join('');
-document.getElementById('p_price').addEventListener('input', e=>{
-  const p = Number(e.target.value||0);
-  document.getElementById('feeBox').innerHTML = `You sell for KSh ${p} - You receive KSh ${Math.round(p*0.9)} - Fee KSh ${Math.round(p*0.1)} (10%)`;
-});
-async function loadProducts(){
-  let q = client.from('products').select('*').order('created_at',{ascending:false});
-  if(currentCat!=="All") q = q.eq('category', currentCat);
-  const search = document.getElementById('search').value;
-  if(search) q = q.ilike('title', `%${search}%`);
-  const {data} = await q;
-  document.getElementById('products').innerHTML = (data||[]).map(p=>`
-    <div class="card">
-      <img src="${p.image_url||'https://via.placeholder.com/300'}">
-      <div><b>${p.title}</b><br><span style="font-size:12px">${p.location}</span><br>
-      <span class="price">KSh ${p.price}</span><br>
-      <button class="wa" onclick="window.open('https://wa.me/${p.whatsapp}?text=Hi, is ${encodeURIComponent(p.title)} still available?')">WhatsApp Seller</button>
-      <button class="btn" onclick="startCheckout(${p.id},'${p.title.replace(/'/g,"")} ',${p.price})">Buy Now</button>
-      </div></div>`).join('');
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dash" class="hidden">
+<div class="card"><h2>📊 My Dashboard</h2>
+<div class="stat"><div><b id="myCount">0</b>My Products</div><div><b id="myValue">0</b>Total Value Ksh</div><div><b id="allCount">0</b>All Products</div></div>
+<p style="font-size:13px;color:#666">This dashboard shows products YOU uploaded on this phone. You can delete them here.</p>
+<button class="orange" onclick="showPage('sell')">+ Add New Product</button>
+</div>
+<h2 style="padding:0 10px">My Products</h2>
+<div id="myProducts"></div>
+</div>
+
+<div class="nav">
+<button id="btn-home" class="active" onclick="showPage('home')">🏠 Home</button>
+<button id="btn-sell" onclick="showPage('sell')">➕ Sell</button>
+<button id="btn-dash" onclick="showPage('dash')">📊 Dashboard</button>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyC9l5YcAi5u_G9aIkzh26XktlOZHttxxyI", authDomain: "lumarket-959df.firebaseapp.com", projectId: "lumarket-959df", storageBucket: "lumarket-959df.firebasestorage.app", messagingSenderId: "724512480435", appId: "1:724512480435:web:8b3e029a54b75a050824c6", measurementId: "G-6G0SZM7GRT" };
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let allProducts = [];
+let searchText = "";
+window.showPage = (p)=>{
+  document.getElementById('page-home').classList.toggle('hidden', p!=='home');
+  document.getElementById('page-sell').classList.toggle('hidden', p!=='sell');
+  document.getElementById('page-dash').classList.toggle('hidden', p!=='dash');
+  document.getElementById('btn-home').classList.toggle('active', p==='home');
+  document.getElementById('btn-sell').classList.toggle('active', p==='sell');
+  document.getElementById('btn-dash').classList.toggle('active', p==='dash');
+  window.scrollTo(0,0);
+};
+window.doSearch = ()=>{ searchText = document.getElementById('search').value.toLowerCase(); render(); };
+window.delProduct = async (id)=>{
+  if(!confirm("Delete this product?")) return;
+  await deleteDoc(doc(db,"products",id));
+  let mine = JSON.parse(localStorage.getItem("myLumarket")||"[]").filter(x=>x!==id);
+  localStorage.setItem("myLumarket", JSON.stringify(mine));
+};
+function compressImage(file){
+  return new Promise((resolve)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas');
+        const max = 800; let w = img.width, h = img.height;
+        if(w>h){ if(w>max){ h*=max/w; w=max; } } else { if(h>max){ w*=max/h; h=max; } }
+        canvas.width=w; canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',0.7));
+      }; img.src = e.target.result;
+    }; reader.readAsDataURL(file);
+  });
 }
-function filterCat(c){ currentCat=c; loadProducts(); }
-document.getElementById('search').addEventListener('input', loadProducts);
-async function postItem(){
-  const title=document.getElementById('p_title').value, price=Number(document.getElementById('p_price').value);
-  if(!title||!price) return alert("Add title + price");
-  const {error} = await client.from('products').insert([{ title, category: document.getElementById('p_cat').value, price, seller_name: document.getElementById('p_name').value, whatsapp: document.getElementById('p_whatsapp').value, location: document.getElementById('p_location').value, image_url: document.getElementById('p_img').value, description: document.getElementById('p_desc').value }]);
-  if(error) return alert(error.message);
-  alert("Posted!"); loadProducts();
+document.getElementById('uploadBtn').onclick = async () => {
+  const name = document.getElementById('pname').value;
+  const price = document.getElementById('pprice').value;
+  const phone = document.getElementById('pphone').value;
+  const cat = document.getElementById('pcat').value;
+  const file = document.getElementById('pphoto').files[0];
+  if(!name || !price || !file){ alert("Fill name, price and photo"); return; }
+  document.getElementById('status').innerText = "Uploading... wait...";
+  const image = await compressImage(file);
+  const d = await addDoc(collection(db, "products"), { name, price, phone, cat, image, createdAt: Date.now() });
+  let mine = JSON.parse(localStorage.getItem("myLumarket")||"[]"); mine.push(d.id); localStorage.setItem("myLumarket", JSON.stringify(mine));
+  document.getElementById('status').innerText = "✅ Uploaded! Check Dashboard";
+  document.getElementById('pname').value=""; document.getElementById('pprice').value="";
+  showPage('dash');
+};
+function render(){
+  let list = allProducts.filter(p=> (p.name+" "+p.cat).toLowerCase().includes(searchText));
+  document.getElementById('count').innerText = `(${list.length})`;
+  document.getElementById('products').innerHTML = list.map(p=>`<div class="card"><img src="${p.image}"><span class="badge">${p.cat||'Other'}</span><h3 style="margin:8px 0 0">${p.name}</h3><p><b>Ksh ${p.price}</b></p><a href="https://wa.me/254${(p.phone||'').slice(-9)}?text=Hi, I want ${p.name} on LUMARKET"><button>Buy on WhatsApp</button></a></div>`).join('') || "<p style='padding:10px'>No products yet. Be first!</p>";
+  let mineIds = JSON.parse(localStorage.getItem("myLumarket")||"[]");
+  let mine = allProducts.filter(p=> mineIds.includes(p.id));
+  let total = mine.reduce((s,p)=> s + Number(p.price||0),0);
+  document.getElementById('myCount').innerText = mine.length;
+  document.getElementById('myValue').innerText = total.toLocaleString();
+  document.getElementById('allCount').innerText = allProducts.length;
+  document.getElementById('myProducts').innerHTML = mine.map(p=>`<div class="card"><img src="${p.image}"><h3>${p.name} - Ksh ${p.price}</h3><p>${p.cat}</p><button class="red" onclick="delProduct('${p.id}')">🗑️ Delete</button></div>`).join('') || "<p style='padding:10px'>You haven't uploaded yet. Tap Sell.</p>";
 }
-function startCheckout(id,title,price){
-  selectedProduct={id,title,price};
-  document.getElementById('checkoutBox').style.display='block';
-  document.getElementById('checkoutInfo').innerHTML=`Buying: <b>${title}</b> - KSh ${price}`;
-  window.scrollTo(0, document.getElementById('checkoutBox').offsetTop);
-}
-async function submitOrder(){
-  const amount = selectedProduct.price;
-  const {error} = await client.from('orders').insert([{ product_id: selectedProduct.id, buyer_name: document.getElementById('buyer_name').value, buyer_phone: document.getElementById('buyer_phone').value, amount, commission: Math.round(amount*0.1), seller_payout: Math.round(amount*0.9), mpesa_code: document.getElementById('mpesa_code').value, status: 'awaiting_verification' }]);
-  if(error) return alert(error.message);
-  alert("Order submitted! Admin will verify your M-Pesa code.");
-}
-loadProducts();
+const q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+onSnapshot(q, (snap) => { allProducts = []; snap.forEach(d=> allProducts.push({id:d.id, ...d.data()})); render(); });
 </script>
 </body>
 </html>
